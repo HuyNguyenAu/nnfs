@@ -40,7 +40,7 @@ model.set_accuracy(Accuracies.Categorical(binary=True))
 model.finalise()
 
 # Perform model training.
-model.train(x_train, y_train, epochs=10000, print_every=100)
+model.train(x_train, y_train, epochs=500, print_every=100)
 
 # Create the test dataset.
 x_test, y_test = spiral_data(samples=100, classes=2)

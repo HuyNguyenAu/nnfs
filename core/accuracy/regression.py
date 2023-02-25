@@ -17,7 +17,7 @@ class Regression(Accuracy):
         '''
         Calculate the precision value based on the passed-in ground truth values.
         '''
-        if self.precision is None or re_init:
+        if self.precision == None or re_init:
             self.precision = np.std(y) / 250
 
     def compare(self, predictions: np.ndarray, y: np.ndarray) -> bool:

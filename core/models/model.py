@@ -2,9 +2,11 @@ import numpy as np
 
 from ..loss_functions import LossFunction
 from ..activation_functions import ActivationFunction
+from ..combined_functions import SoftmaxCategoricalCrossEntropy
 from ..optimisers import Optimiser
 from ..layers import Layer, Input, Dense, Dropout
 from ..accuracy import Accuracy
+from ..types import CombinedFunctionType
 
 
 class Model:
@@ -21,6 +23,7 @@ class Model:
         self.prediction_layer: ActivationFunction = None
         self.trainable_layers: list[int] = []
         self.dropout_layers: list[int] = []
+        self.combined_function_type: CombinedFunctionType = None
 
     def add_layer(self, layer: Layer) -> None:
         '''
@@ -46,25 +49,6 @@ class Model:
         '''
         self.accuracy = accuracy
 
-    def index_of_enabled_layer(self, position: int, reverse: bool = False) -> int:
-        '''
-        Find the first or last index of the last layer that is enabled.
-        '''
-        layer_count: int = len(self.layers)
-
-        for i in reversed(range(position)):
-            index: int = i
-
-            if reverse:
-                index = layer_count - i
-
-            if self.layers[index].get_is_disabled():
-                continue
-
-            return index
-
-        return None
-
     def forward(self, x: np.ndarray) -> np.ndarray:
         '''
         Perform a forward pass.
@@ -74,14 +58,12 @@ class Model:
         layer_count: int = len(self.layers)
 
         for i in range(layer_count):
-            if self.layers[i].get_is_disabled():
-                print(self.layers[i])
-                continue
+            current_layer: Layer = self.layers[i]
 
             if i <= 0:
-                self.layers[i].forward(self.input_layer.get_output())
+                current_layer.forward(self.input_layer.get_output())
             else:
-                self.layers[i].forward(self.layers[i - 1].get_output())
+                current_layer.forward(self.layers[i - 1].get_output())
 
         return self.layers[layer_count - 1].get_output()
 
@@ -100,29 +82,48 @@ class Model:
             else:
                 self.layers[i].backward(self.layers[i + 1].get_d_inputs())
 
+    def get_combined_function_type(self, combined_function: Layer) -> CombinedFunctionType:
+        '''
+        Determine the combined function type from the given combined function.
+        '''
+        if isinstance(combined_function, SoftmaxCategoricalCrossEntropy):
+            return CombinedFunctionType.ACTIVATION_LOSS
+
+        return None
+
     def finalise(self) -> None:
         '''
         Finalise the model.
         '''
         self.input_layer = Input()
 
-        # Keep track of all trainable and dropout layers.
         for i, _ in enumerate(self.layers):
+            current_layer: Layer = self.layers[i]
+
+            # Keep track of all trainable and dropout layers.
             # NOTE: For now, we will only be dealing with Dense layers. This should be fine for now.
-            if self.layers[i].get_is_trainable() and isinstance(self.layers[i], Dense):
+            if current_layer.get_is_trainable() and isinstance(current_layer, Dense):
                 self.trainable_layers.append(i)
-            elif isinstance(self.layers[i], Dropout):
+            elif isinstance(current_layer, Dropout):
                 self.dropout_layers.append(i)
 
-            if isinstance(self.layers[i], ActivationFunction) and i >= len(self.layers) - 1:
-                self.prediction_layer = self.layers[i]
+            # Set the prediction layer.
+            # If we come across a combined function, set the combined function type.
+            if i >= len(self.layers) - 1:
+                if isinstance(current_layer, SoftmaxCategoricalCrossEntropy):
+                    self.loss_function = current_layer
+                    self.prediction_layer = current_layer
+                    self.combined_function_type = CombinedFunctionType.ACTIVATION_LOSS
+                elif isinstance(current_layer, ActivationFunction):
+                    self.prediction_layer = current_layer
+                    print(isinstance(current_layer,
+                          SoftmaxCategoricalCrossEntropy), current_layer)
 
     def calculate_regularisation_loss(self) -> float:
         '''
         Get the regularisation loss for the current epoch.
         '''
         regularisation_loss: float = 0
-
         for i in self.trainable_layers:
             regularisation_loss += self.loss_function.regularisation_loss(
                 self.layers[i])
@@ -150,16 +151,19 @@ class Model:
             # Perform a forwards pass.
             output = self.forward(x_train)
 
+            data_loss: float = None
+
             # Calculate the losses.
             data_loss: float = self.loss_function.calculate(output, y_train)
             regularisation_loss: float = self.calculate_regularisation_loss()
             loss: float = regularisation_loss + data_loss
 
             # Get predictions.
-            predictions = self.layers[len(self.layers) - 1].prediction(output)
+            predictions = self.prediction_layer.prediction(output)
 
             # Calculate accuracy.
-            accuracy: float = self.accuracy.calculate(predictions, y_train)
+            accuracy: float = self.accuracy.calculate(
+                predictions, y_train, self.combined_function_type)
 
             if not epoch % print_every:
                 print(
@@ -204,10 +208,11 @@ class Model:
         loss = self.loss_function.calculate(output, y_val)
 
         # Get predictions.
-        predictions: np.ndarray = self.prediction_layer.prediction(output)
+        predictions = self.prediction_layer.prediction(output)
 
-        # Calculate the accuracy.
-        accuracy = self.accuracy.calculate(predictions=predictions, y=y_val)
+        # Calculate accuracy.
+        accuracy: float = self.accuracy.calculate(
+                predictions, y_val, self.combined_function_type)
 
         print(
             f'Validation Accuracy: {accuracy:.9f}, Validation Loss: {loss:.9f}')
