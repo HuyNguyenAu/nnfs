@@ -24,10 +24,10 @@ class Softmax(ActivationFunction):
         # Enumerate outputs and gradients.
         for index, (single_output, single_d_values) in enumerate(zip(self.get_output(), d_values)):
             # Faltten output array.
-            single_output = single_output.reshape(-1, 1)
+            single_output: np.ndarray = single_output.reshape(-1, 1)
 
             # Calculate the Jacobian matrix from the output.
-            jacobian_matrix = np.diagflat(
+            jacobian_matrix: np.ndarray = np.diagflat(
                 single_output) - np.dot(single_output, single_output.T)
 
             # Calculate the sample-wise gradient and add it to the sample gradients.
