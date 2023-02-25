@@ -1,7 +1,6 @@
 import numpy as np
 
-from core.layers.layer import Layer
-
+from ..layers.layer import Layer
 from ..activation_functions import Softmax
 from ..loss_functions import CategoricalCrossEntropy
 
