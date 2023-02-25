@@ -116,8 +116,6 @@ class Model:
                     self.combined_function_type = CombinedFunctionType.ACTIVATION_LOSS
                 elif isinstance(current_layer, ActivationFunction):
                     self.prediction_layer = current_layer
-                    print(isinstance(current_layer,
-                          SoftmaxCategoricalCrossEntropy), current_layer)
 
     def calculate_regularisation_loss(self) -> float:
         '''
