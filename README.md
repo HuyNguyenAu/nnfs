@@ -1,5 +1,5 @@
 # Wobbly ML
-A simple ML library based on the [Neural Networks From Scratch](https://nnfs.io) book.
+A ML library based on the [Neural Networks From Scratch](https://nnfs.io) book.
 
 ## Requirements
 - Python 3.9.13 minimum
