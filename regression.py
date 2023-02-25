@@ -6,11 +6,15 @@ from core import Models, Layers, ActivationFunctions, LossFunctions, Optimisers,
 nnfs.init()
 
 # Create training dataset.
-x_train, y_train = spiral_data(samples=100, classes=2)
+x, y = spiral_data(samples=1000, classes=2)
 
 # Reshape labels to be list of lists. Inner list contains binary values per neuron output.
 # From [0, 0, 0] to [[0], [0], [0]].
-y_train = y_train.reshape(-1, 1)
+y = y.reshape(-1, 1)
+
+x_train, y_train = x[:500], y[:500]
+x_val, y_val = x[500:], y[500:]
+
 
 # Create a new model.
 model = Models.Model()
@@ -42,11 +46,5 @@ model.finalise()
 # Perform model training.
 model.train(x_train, y_train, epochs=500, print_every=100)
 
-# Create the test dataset.
-x_test, y_test = spiral_data(samples=100, classes=2)
-
-# Reshape labels.
-y_test = y_test.reshape(-1, 1)
-
 # Perfom model predication.
-model.validate(x_val=x_test, y_val=y_test)
+model.validate(x_val, y_val)
