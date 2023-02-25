@@ -13,7 +13,7 @@ class Categorical(Accuracy):
         '''
         self.binary: float = binary
 
-    def compare(self, predictions: np.ndarray, y: np.ndarray) -> bool:
+    def compare(self, *, predictions: np.ndarray, y: np.ndarray) -> bool:
         # If labels are one-hot encoded, turn them into discrete values.
         # Eg. y_true = [[1, 0, 0], [0, 1, 0], ...]
         if not self.binary and len(y.shape) == 2:

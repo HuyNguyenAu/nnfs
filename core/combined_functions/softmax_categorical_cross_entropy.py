@@ -1,11 +1,11 @@
 import numpy as np
 
-from ..activation_functions import ActivationFunction
-from ..loss_functions import CategoricalCrossEntropy
+from ..layers.layer import Layer
 from ..activation_functions import Softmax
+from ..loss_functions import CategoricalCrossEntropy
 
 
-class SoftmaxCategoricalCrossEntropy(ActivationFunction):
+class SoftmaxCategoricalCrossEntropy(Layer):
     '''
     The Categorical Cross Entropy loss function combined with
     Softmax Activation for faster backwards pass.
@@ -14,25 +14,27 @@ class SoftmaxCategoricalCrossEntropy(ActivationFunction):
     def __init__(self) -> None:
         '''
         '''
-        self.activation: Softmax = Softmax()
-        self.loss: CategoricalCrossEntropy = CategoricalCrossEntropy()
-        self.output: np.ndarray = []
+        super().__init__()
 
-    def forward(self, inputs: np.ndarray, y_true: np.ndarray) -> None:
+        self.activation = Softmax()
+        self.loss = CategoricalCrossEntropy()
+
+    def forward(self, inputs: np.ndarray) -> None:
         '''
-        Forward pass.
+        Perform a forward pass.
         '''
         self.activation.forward(inputs)
+        super().set_output(self.activation.get_output())
 
-        self.set_output(self.activation.get_output())
-
-        # Calculate the loss.
-        return self.loss.calculate(self.output, y_true)
-
-    def backward(self, d_values: np.ndarray, y_true: np.ndarray) -> None:
+    def backward(self, d_values: np.ndarray, y_true: np.ndarray = None) -> None:
         '''
-        Backward pass.
+        Perform a backward pass.
         '''
+        # This will keep the model backward pass simple, since it will only invoke
+        # this function will a single parameter.
+        if y_true is None:
+            return
+        
         samples: int = len(d_values)
 
         # If labels are one-hot encoded, turn them into discrete values.
@@ -48,4 +50,22 @@ class SoftmaxCategoricalCrossEntropy(ActivationFunction):
         d_inputs[range(samples), y_true] -= 1
 
         # Normalise gradients.
-        self.set_d_inputs(d_inputs / samples)
+        super().set_d_inputs(d_inputs / samples)
+
+    def calculate(self, output: np.ndarray, y: np.ndarray) -> np.ndarray:
+        '''
+        Calculate the data and regularlisation losses given the model output and ground truth values.
+        '''
+        return self.loss.calculate(output=output, y=y)
+    
+    def regularisation_loss(self, layer: any) -> np.number:
+        '''
+        Calculate the regularisation loss.
+        '''
+        return self.loss.regularisation_loss(layer)
+
+    def prediction(self, output: np.ndarray) -> np.ndarray:
+        '''
+        Calculate the predictions for the output.
+        '''
+        return self.activation.prediction(output=output)
