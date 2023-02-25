@@ -9,12 +9,6 @@ class Accuracy:
     The base accuracy class.
     '''
 
-    def init(self, y: np.ndarray, re_init: bool = False) -> None:
-        '''
-        Calculate the precision value based on the passed-in ground truth values.
-        '''
-        return NotImplementedError
-
     def compare(self, predictions: np.ndarray, y: np.ndarray) -> bool:
         '''
         Compares the predictions to the ground truth values.
@@ -30,4 +24,4 @@ class Accuracy:
             if len(y.shape) == 2:
                 y = np.argmax(y, axis=1)
 
-        return np.mean(self.compare(predictions, y))
+        return np.mean(self.compare(predictions=predictions, y=y))

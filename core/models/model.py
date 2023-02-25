@@ -145,7 +145,6 @@ class Model:
         '''
         Train the model.
         '''
-        self.accuracy.init(y=y_train)
 
         for epoch in range(0, epochs):
             # Perform a forwards pass.
