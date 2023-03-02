@@ -1,7 +1,5 @@
 
 
-
-
 # %%
 from nnfs.datasets import spiral_data
 import nnfs

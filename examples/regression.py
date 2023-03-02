@@ -66,4 +66,3 @@ plt.plot(x_train, y_train)
 plt.plot(x_val, y_val)
 plt.plot(x_val, output_test)
 plt.show()
-# %%
