@@ -12,7 +12,6 @@ class DataLoader:
         # Calculate the training and validation dataset counts.
         train_count: int = ceil(len(x) * 0.8)
         val_count: int = len(x) - train_count
-        print(train_count, val_count)
         
         self.x_train: np.ndarray = x[:train_count]
         self.y_train: np.ndarray = y[:train_count]
