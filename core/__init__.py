@@ -5,6 +5,7 @@ from . import layers as Layers
 from . import loss_functions as LossFunctions
 from . import models as Models
 from . import optimisers as Optimisers
+from . import data as Data
 
 __all__ = [
     'Accuracies',
@@ -14,4 +15,5 @@ __all__ = [
     'LossFunctions',
     'Models',
     'Optimisers',
+    'Data',
 ]
