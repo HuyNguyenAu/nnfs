@@ -10,7 +10,7 @@ nnfs.init()
 x, y = spiral_data(samples=5000, classes=3)
 
 # Create training and validation dataset.
-data_loader: Data.DataLoader = Data.DataLoader(x=x,y=y)
+data_loader: Data.DataLoader = Data.DataLoader(x=x, y=y)
 x_train, y_train = data_loader.get_training_data()
 x_val, y_val = data_loader.get_validation_data()
 

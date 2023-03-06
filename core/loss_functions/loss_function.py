@@ -39,7 +39,7 @@ class LossFunction(Layer):
         self.accumulated_sample_count += len(sample_losses)
 
         return data_loss
-    
+
     def calculate_accumulated_loss(self) -> np.ndarray:
         '''
         Calculate the accumulated loss.
@@ -73,7 +73,7 @@ class LossFunction(Layer):
                 np.sum(layer.get_biases() * layer.get_biases())
 
         return regularisation_loss
-    
+
     def reset_accumulation(self) -> None:
         '''
         Set the accumulated loss and sample count to zero.

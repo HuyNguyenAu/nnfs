@@ -12,7 +12,7 @@ class Categorical(Accuracy):
         '''
         '''
         super().__init__()
-        
+
         self.binary: float = binary
 
     def compare(self, *, predictions: np.ndarray, y: np.ndarray) -> bool:

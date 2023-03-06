@@ -8,7 +8,7 @@ class Accuracy:
     '''
     The base accuracy class.
     '''
-    
+
     def __init__(self) -> None:
         '''
         '''
@@ -42,7 +42,7 @@ class Accuracy:
         Calculate the accumulated accuracy.
         '''
         return self.accumulated_comparision / self.accumulated_sample_count
-    
+
     def reset_accumulation(self) -> None:
         '''
         Set the accumulated loss and sample count to zero.
