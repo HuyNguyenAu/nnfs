@@ -11,6 +11,8 @@ class Regression(Accuracy):
     def __init__(self, y: np.ndarray) -> None:
         '''
         '''
+        super().__init__()
+
         # Calculate the precision value based on the passed-in ground truth values.
         self.precision: float = np.std(y) / 250
 

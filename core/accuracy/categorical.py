@@ -11,6 +11,8 @@ class Categorical(Accuracy):
     def __init__(self, *, binary=False) -> None:
         '''
         '''
+        super().__init__()
+        
         self.binary: float = binary
 
     def compare(self, *, predictions: np.ndarray, y: np.ndarray) -> bool:

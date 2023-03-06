@@ -1,5 +1,7 @@
 import numpy as np
 
+import math
+
 from ..loss_functions import LossFunction
 from ..activation_functions import ActivationFunction
 from ..combined_functions import SoftmaxCategoricalCrossEntropy
@@ -139,44 +141,83 @@ class Model:
 
         self.optimiser.post_update_parameters()
 
-    def train(self, x_train: np.ndarray, y_train: np.ndarray, *, epochs: int = 1, print_every: int = 100) -> None:
+    def train(self, x_train: np.ndarray, y_train: np.ndarray, *, epochs: int = 1, batch_size: int = None, print_every: int = 100) -> None:
         '''
         Train the model.
         '''
+        # The default value if batch size is not set.
+        steps: int = 1
+
+        if batch_size is not None:
+            steps = math.ceil(len(x_train) / batch_size)
 
         for epoch in range(0, epochs):
-            # Perform a forwards pass.
-            output = self.forward(x_train)
+            self.loss_function.reset_accumulation()
+            self.accuracy.reset_accumulation()
 
-            data_loss: float = None
+            for step in range(steps):
+                batch_x_train: np.ndarray = x_train
+                batch_y_train: np.ndarray = y_train
 
-            # Calculate the losses.
-            data_loss: float = self.loss_function.calculate(output, y_train)
-            regularisation_loss: float = self.calculate_regularisation_loss()
-            loss: float = regularisation_loss + data_loss
+                if batch_size is not None:
+                    batch_x_train = x_train[step *
+                                            batch_size: (step + 1) * batch_size]
+                    batch_y_train = y_train[step *
+                                            batch_size: (step + 1) * batch_size]
 
-            # Get predictions.
-            predictions = self.prediction_layer.prediction(output)
+                # Perform a forwards pass.
+                output = self.forward(batch_x_train)
 
-            # Calculate accuracy.
-            accuracy: float = self.accuracy.calculate(
-                predictions, y_train, self.combined_function_type)
+                data_loss: float = None
 
-            if not epoch % print_every:
-                print(
-                    f'Epoch: {epoch}, ' +
-                    f'Accuracy: {accuracy:.3f}, ' +
-                    f'Loss: {loss:.9f}, ' +
-                    f'Data Loss: {data_loss:.9f}, ' +
-                    f'Regularisation Loss: {regularisation_loss:.9f}, ' +
-                    f'Learning Rate: {self.optimiser.get_current_learning_rate():.9f}'
-                )
+                # Calculate the losses.
+                data_loss: float = self.loss_function.calculate(
+                    output, batch_y_train)
+                regularisation_loss: float = self.calculate_regularisation_loss()
+                loss: float = regularisation_loss + data_loss
 
-            # Perform a backwards pass.
-            self.backward(output, y_train)
+                # Get predictions.
+                predictions = self.prediction_layer.prediction(output)
 
-            # Perfom optimisations.
-            self.optimise()
+                # Calculate accuracy.
+                accuracy: float = self.accuracy.calculate(
+                    predictions, batch_y_train, self.combined_function_type)
+
+                # Perform a backwards pass.
+                self.backward(output, batch_y_train)
+
+                # Perfom optimisations.
+                self.optimise()
+
+                if step <= steps:
+                    print(
+                        f'Epoch: {epoch}, ' +
+                        f'Step: {step}, ' +
+                        f'Accuracy: {accuracy:.3f}, ' +
+                        f'Loss: {loss:.9f}, ' +
+                        f'Data Loss: {data_loss:.9f}, ' +
+                        f'Regularisation Loss: {regularisation_loss:.9f}, ' +
+                        f'Learning Rate: {self.optimiser.get_current_learning_rate():.9f}'
+                    )
+
+            if batch_size is None:
+                continue
+
+            # Calculate the accumulated loss.
+            accumulated_data_loss: float = self.loss_function.calculate_accumulated_loss()
+            accumulated_regularisation_loss: float = self.calculate_regularisation_loss()
+            accumulated_loss: float = accumulated_data_loss + accumulated_regularisation_loss
+
+            # Calculate the accumulated accuracy.
+            accumulated_accuracy: float = self.accuracy.calculate_accumulated_accuracy()
+
+            print(
+                f'Accumulated Accuracy: {accumulated_accuracy:.3f}, ' +
+                f'Accumulated Loss: {accumulated_loss:.9f}, ' +
+                f'Accumulated Data Loss: {accumulated_data_loss:.9f}, ' +
+                f'Accumulated Regularisation Loss: {accumulated_regularisation_loss:.9f}, ' +
+                f'Learning Rate: {self.optimiser.get_current_learning_rate():.9f}'
+            )
 
     def prediction(self, x: np.ndarray) -> np.ndarray:
         '''
@@ -195,21 +236,40 @@ class Model:
 
         return output
 
-    def validate(self, x_val: np.ndarray, y_val: np.ndarray) -> None:
+    def validate(self, x_val: np.ndarray, y_val: np.ndarray, batch_size: int = None) -> None:
         '''
         Perform model validation.
         '''
-        output: np.ndarray = self.prediction(x_val)
+        # The default value if batch size is not set.
+        steps: int = 1
+
+        if batch_size is not None:
+            steps = math.ceil(len(x_val) / batch_size)
+
+        self.loss_function.reset_accumulation()
+        self.accuracy.reset_accumulation()
+
+        for step in range(steps):
+            batch_x_train: np.ndarray = x_val
+            batch_y_train: np.ndarray = y_val
+
+            if batch_size is not None:
+                batch_x_train = x_val[step *
+                                      batch_size: (step + 1) * batch_size]
+                batch_y_train = y_val[step *
+                                      batch_size: (step + 1) * batch_size]
+
+            output: np.ndarray = self.prediction(batch_x_train)
 
         # Calculate model loss.
-        loss = self.loss_function.calculate(output, y_val)
+        loss = self.loss_function.calculate(output, batch_y_train)
 
         # Get predictions.
         predictions = self.prediction_layer.prediction(output)
 
         # Calculate accuracy.
         accuracy: float = self.accuracy.calculate(
-                predictions, y_val, self.combined_function_type)
+            predictions, batch_y_train, self.combined_function_type)
 
         print(
             f'Validation Accuracy: {accuracy:.9f}, Validation Loss: {loss:.9f}')

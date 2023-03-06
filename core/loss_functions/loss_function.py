@@ -12,6 +12,8 @@ class LossFunction(Layer):
         '''
         '''
         super().__init__(is_trainable=False)
+        self.accumulated_loss: float = 0
+        self.accumulated_sample_count: int = 0
 
     def forward(self, y_pred: np.ndarray, y_true: np.ndarray) -> None:
         '''
@@ -33,7 +35,16 @@ class LossFunction(Layer):
         sample_losses: np.ndarray = self.forward(output, y)
         data_loss: np.ndarray = np.mean(sample_losses)
 
+        self.accumulated_loss += np.sum(sample_losses)
+        self.accumulated_sample_count += len(sample_losses)
+
         return data_loss
+    
+    def calculate_accumulated_loss(self) -> np.ndarray:
+        '''
+        Calculate the accumulated loss.
+        '''
+        return self.accumulated_loss / self.accumulated_sample_count
 
     def regularisation_loss(self, layer: Dense) -> np.number:
         '''
@@ -62,3 +73,10 @@ class LossFunction(Layer):
                 np.sum(layer.get_biases() * layer.get_biases())
 
         return regularisation_loss
+    
+    def reset_accumulation(self) -> None:
+        '''
+        Set the accumulated loss and sample count to zero.
+        '''
+        self.accumulated_loss = 0
+        self.accumulated_sample_count = 0
