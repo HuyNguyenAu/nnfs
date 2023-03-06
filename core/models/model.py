@@ -250,26 +250,44 @@ class Model:
         self.accuracy.reset_accumulation()
 
         for step in range(steps):
-            batch_x_train: np.ndarray = x_val
-            batch_y_train: np.ndarray = y_val
+            batch_x_val: np.ndarray = x_val
+            batch_y_val: np.ndarray = y_val
 
             if batch_size is not None:
-                batch_x_train = x_val[step *
-                                      batch_size: (step + 1) * batch_size]
-                batch_y_train = y_val[step *
-                                      batch_size: (step + 1) * batch_size]
+                batch_x_val = x_val[step *
+                                    batch_size: (step + 1) * batch_size]
+                batch_y_val = y_val[step *
+                                    batch_size: (step + 1) * batch_size]
 
-            output: np.ndarray = self.prediction(batch_x_train)
+            output: np.ndarray = self.prediction(batch_x_val)
 
-        # Calculate model loss.
-        loss = self.loss_function.calculate(output, batch_y_train)
+            # Calculate model loss.
+            loss = self.loss_function.calculate(output, batch_y_val)
 
-        # Get predictions.
-        predictions = self.prediction_layer.prediction(output)
+            # Get predictions.
+            predictions = self.prediction_layer.prediction(output)
 
-        # Calculate accuracy.
-        accuracy: float = self.accuracy.calculate(
-            predictions, batch_y_train, self.combined_function_type)
+            # Calculate accuracy.
+            accuracy: float = self.accuracy.calculate(
+                predictions, batch_y_val, self.combined_function_type)
+
+            if step <= steps:
+                print(
+                    f'Step: {step}, ' +
+                    f'Validation Accuracy: {accuracy:.9f}, ' +
+                    f'Validation Loss: {loss:.9f}'
+                )
+
+        if batch_size is None:
+            return
+
+        # Calculate the accumulated loss.
+        accumulated_loss: float = self.loss_function.calculate_accumulated_loss()
+
+        # Calculate the accumulated accuracy.
+        accumulated_accuracy: float = self.accuracy.calculate_accumulated_accuracy()
 
         print(
-            f'Validation Accuracy: {accuracy:.9f}, Validation Loss: {loss:.9f}')
+            f'Accumulated Accuracy: {accumulated_accuracy:.3f}, ' +
+            f'Accumulated Loss: {accumulated_loss:.9f}'
+        )
