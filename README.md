@@ -9,6 +9,10 @@ Install the following libraries:
 ```
 $ pip install numpy matplotlib nnfs
 ```
+Install wobbly-ml as a dev library:
+```
+$ sh install.sh
+```
 
 ## Usage
 Run the example `main.py` file:
