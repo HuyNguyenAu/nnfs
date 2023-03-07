@@ -11,9 +11,7 @@ x = np.arange(SAMPLES).reshape(-1, 1) / SAMPLES
 y = AMPLITUDE * np.sin(4 * np.pi * x).reshape(-1, 1)
 
 # Create training and validation dataset.
-data_loader: Data.DataLoader = Data.DataLoader(x=x, y=y)
-x_train, y_train = data_loader.get_training_data()
-x_val, y_val = data_loader.get_validation_data()
+data_loader: Data.DataLoader = Data.DataLoader(x_train=x, y_train=y)
 
 # Create a new model.
 model = Models.Model()
@@ -55,20 +53,20 @@ model.set_loss_function(LossFunctions.MeanSquaredError())
 model.set_optimiser(Optimisers.Adam(learning_rate=0.005, decay=1e-3))
 
 # Set the accuracy.
-model.set_accuracy(Accuracies.Regression(y_train))
+model.set_accuracy(Accuracies.Regression(data_loader.get_y_train()))
 
 # Finalise the model.
 model.finalise()
 
 # Perform model training.
-model.train(x_train, y_train, epochs=500, print_every=100)
+model.train(data_loader.get_x_train(), data_loader.get_y_train(), epochs=500, print_every=100)
 
 # Perfom model validation.
-pred_y = model.prediction(x_val)
+pred_y = model.prediction(data_loader.get_x_val())
 
-plt.plot(x_train, y_train, label='Training')
-plt.plot(x_val, y_val, label='Validation')
-plt.plot(x_val, pred_y, label='Prediction')
+plt.plot(data_loader.get_x_train(), data_loader.get_y_train(), label='Training')
+plt.plot(data_loader.get_x_val(), data_loader.get_y_val(), label='Validation')
+plt.plot(data_loader.get_x_val(), pred_y, label='Prediction')
 plt.legend()
 plt.show()
 # %%
