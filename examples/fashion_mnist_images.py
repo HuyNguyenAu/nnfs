@@ -35,17 +35,19 @@ y_train: list[int] = []
 x_val = []
 y_val: list[int] = []
 
+
+def task(path: str) -> tuple[str, int, np.ndarray]:
+    '''
+    '''
+    items: list[str] = path.split('/')
+    return (path, int(items[-2]), imread(path, IMREAD_UNCHANGED))
+
+
 # Load all images in parallel.
 with Pool(10) as pool:
     # Find all files recursively and build up out training and validation data.
     print(f'Searching for all images in {folder}...')
     image_paths: list[str] = iglob(f'{folder}/**/*.png', recursive=True)
-
-    def task(path: str) -> tuple[str, int, np.ndarray]:
-        '''
-        '''
-        items: list[str] = path.split('/')
-        return (path, int(items[-2]), imread(path, IMREAD_UNCHANGED))
 
     for file_path, label, image in pool.map_async(task, image_paths).get():
         print(f'Loading {file_path}...')
@@ -113,3 +115,6 @@ model.finalise()
 # Perform model training.
 model.train(x_train=x_train, y_train=y_train,
             epochs=5, batch_size=128, print_every=100)
+
+# Perfom model evaluation.
+model.evaluate(x_train, y_train)

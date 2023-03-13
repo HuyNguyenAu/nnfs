@@ -141,6 +141,58 @@ class Model:
 
         self.optimiser.post_update_parameters()
 
+    def evaluate(self, x_val: np.ndarray, y_val: np.ndarray, batch_size: int = None) -> None:
+        '''
+        Evaluate the model.
+        '''
+        # The default value if batch size is not set.
+        steps: int = 1
+
+        if batch_size is not None:
+            steps = math.ceil(len(x_val) / batch_size)
+
+        self.loss_function.reset_accumulation()
+        self.accuracy.reset_accumulation()
+
+        for step in range(steps):
+            batch_x_val: np.ndarray = x_val
+            batch_y_val: np.ndarray = y_val
+
+            if batch_size is not None:
+                batch_x_val = x_val[step *
+                                    batch_size: (step + 1) * batch_size]
+                batch_y_val = y_val[step *
+                                    batch_size: (step + 1) * batch_size]
+
+            # Perform a forwards pass.
+            output = self.prediction(batch_x_val)
+
+            # Calculate the losses.
+            self.loss_function.calculate(output, batch_y_val)
+
+            # Get predictions.
+            predictions = self.prediction_layer.prediction(output)
+
+            # Calculate accuracy.
+            self.accuracy.calculate(
+                predictions, batch_y_val, self.combined_function_type)
+
+        # Calculate the accumulated loss.
+        accumulated_data_loss: np.number = self.loss_function.calculate_accumulated_loss()
+        accumulated_regularisation_loss: np.number = self.calculate_regularisation_loss()
+        accumulated_loss: np.number = accumulated_data_loss + \
+            accumulated_regularisation_loss
+
+        # Calculate the accumulated accuracy.
+        accumulated_accuracy: np.number = self.accuracy.calculate_accumulated_accuracy()
+
+        print(
+            f'Accumulated Accuracy: {accumulated_accuracy:.3f}, ' +
+            f'Accumulated Loss: {accumulated_loss:.9f}, ' +
+            f'Accumulated Data Loss: {accumulated_data_loss:.9f}, ' +
+            f'Accumulated Regularisation Loss: {accumulated_regularisation_loss:.9f}'
+        )
+
     def train(self, x_train: np.ndarray, y_train: np.ndarray, *, epochs: int = 1, batch_size: int = None, print_every: int = 100) -> None:
         '''
         Train the model.
