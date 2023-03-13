@@ -35,17 +35,17 @@ y_train: list[int] = []
 x_val = []
 y_val: list[int] = []
 
-def task(path: str) -> tuple[str, int, np.ndarray]:
-    '''
-    '''
-    items: list[str] = path.split('/')
-    return (path, int(items[-2]), imread(path, IMREAD_UNCHANGED))
-
 # Load all images in parallel.
 with Pool(10) as pool:
     # Find all files recursively and build up out training and validation data.
     print(f'Searching for all images in {folder}...')
     image_paths: list[str] = iglob(f'{folder}/**/*.png', recursive=True)
+
+    def task(path: str) -> tuple[str, int, np.ndarray]:
+        '''
+        '''
+        items: list[str] = path.split('/')
+        return (path, int(items[-2]), imread(path, IMREAD_UNCHANGED))
 
     for file_path, label, image in pool.map_async(task, image_paths).get():
         print(f'Loading {file_path}...')
@@ -80,16 +80,36 @@ data_loader: Data.DataLoader = Data.DataLoader(
 # Shuffle the training dataset.
 data_loader.shuffle()
 
+# Create a new model.
 model = Models.Model()
+
+# Add a dense layer with 2 input features and 128 output values.
 model.add_layer(Layers.Dense(x_train.shape[1], 128))
+
+# Add a ReLU activation function.
 model.add_layer(ActivationFunctions.ReLU())
+
+# Add a dense layer with 128 input features and 128 output values.
 model.add_layer(Layers.Dense(128, 128))
+
+# Add a ReLU activation function.
 model.add_layer(ActivationFunctions.ReLU())
+
+# Add a dense layer with 128 input features and 10 output values.
 model.add_layer(Layers.Dense(128, 10))
+
+# Add the Softmax Categorical Cross Entropy combined loss and activation function.
 model.add_layer(CombinedFunctions.SoftmaxCategoricalCrossEntropy())
+
+# Set the optimiser to ADAM.
 model.set_optimiser(Optimisers.Adam(decay=1e-3))
+
+# Set the accuracy as Categorical.
 model.set_accuracy(Accuracies.Categorical())
 
+# Finalise the model.
 model.finalise()
+
+# Perform model training.
 model.train(x_train=x_train, y_train=y_train,
-            epochs=10, batch_size=128, print_every=100)
+            epochs=5, batch_size=128, print_every=100)
