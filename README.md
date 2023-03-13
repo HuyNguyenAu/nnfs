@@ -9,6 +9,15 @@ Install the following libraries:
 ```
 $ pip install numpy
 ```
+Install wobbly-ml as a dev library:
+```
+$ sh install.sh
+```
+
+Running the examples will require additional libraries:
+```
+$ pip install matplotlib nnfs opencv-contrib-python-headless
+``` 
 
 Running the examples will require additional libraries:
 ```
