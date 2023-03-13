@@ -69,3 +69,15 @@ class SoftmaxCategoricalCrossEntropy(Layer):
         Calculate the predictions for the output.
         '''
         return self.activation.prediction(output=output)
+
+    def calculate_accumulated_loss(self) -> np.ndarray:
+        '''
+        Calculate the accumulated loss.
+        '''
+        return self.loss.calculate_accumulated_loss()
+
+    def reset_accumulation(self) -> None:
+        '''
+        Set the accumulated loss and sample count to zero.
+        '''
+        self.loss.reset_accumulation()

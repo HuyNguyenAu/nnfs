@@ -12,8 +12,8 @@ class Accuracy:
     def __init__(self) -> None:
         '''
         '''
-        self.accumulated_comparision: float = 0
-        self.accumulated_sample_count: int = 0
+        self.accumulated_comparision: np.number = 0
+        self.accumulated_sample_count: np.number = 0
 
     def compare(self, predictions: np.ndarray, y: np.ndarray) -> bool:
         '''
@@ -21,7 +21,7 @@ class Accuracy:
         '''
         return NotImplementedError
 
-    def calculate(self, predictions: np.ndarray, y: np.ndarray, combined_function_type: CombinedFunctionType) -> np.float32:
+    def calculate(self, predictions: np.ndarray, y: np.ndarray, combined_function_type: CombinedFunctionType) -> np.number:
         '''
         Calculate the accuracy of the given predictions and ground truths.
         '''
@@ -47,5 +47,5 @@ class Accuracy:
         '''
         Set the accumulated loss and sample count to zero.
         '''
-        self.accumulated_loss = 0
+        self.accumulated_comparision = 0
         self.accumulated_sample_count = 0
