@@ -19,6 +19,11 @@ Running the examples will require additional libraries:
 $ pip install matplotlib nnfs opencv-contrib-python-headless
 ``` 
 
+Running the examples will require additional libraries:
+```
+$ pip install matplotlib nnfs opencv-contrib-python-headless
+``` 
+
 ## Usage
 Run the example `regression.py` file:
 ```

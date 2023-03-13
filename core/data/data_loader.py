@@ -28,6 +28,16 @@ class DataLoader:
         self.y_train = y_train[:train_count]
         self.x_val = x_train[-val_count:]
         self.y_val = y_train[-val_count:]
+        
+    def shuffle(self) -> None:
+        '''
+        Shuffle the training dataset.
+        '''
+        keys: list[int] = np.array(range(self.x_train.shape[0]))
+        np.random.shuffle(keys)
+        
+        self.x_train = self.x_train[keys]
+        self.y_train = self.x_train[keys]
 
     def get_x_train(self) -> np.ndarray:
         '''
