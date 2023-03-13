@@ -119,11 +119,11 @@ class Model:
                 elif isinstance(current_layer, ActivationFunction):
                     self.prediction_layer = current_layer
 
-    def calculate_regularisation_loss(self) -> float:
+    def calculate_regularisation_loss(self) -> np.number:
         '''
         Get the regularisation loss for the current epoch.
         '''
-        regularisation_loss: float = 0
+        regularisation_loss: np.number = 0
         for i in self.trainable_layers:
             regularisation_loss += self.loss_function.regularisation_loss(
                 self.layers[i])
@@ -168,19 +168,19 @@ class Model:
                 # Perform a forwards pass.
                 output = self.forward(batch_x_train)
 
-                data_loss: float = None
+                data_loss: np.number = None
 
                 # Calculate the losses.
-                data_loss: float = self.loss_function.calculate(
+                data_loss: np.number = self.loss_function.calculate(
                     output, batch_y_train)
-                regularisation_loss: float = self.calculate_regularisation_loss()
-                loss: float = regularisation_loss + data_loss
+                regularisation_loss: np.number = self.calculate_regularisation_loss()
+                loss: np.number = regularisation_loss + data_loss
 
                 # Get predictions.
                 predictions = self.prediction_layer.prediction(output)
 
                 # Calculate accuracy.
-                accuracy: float = self.accuracy.calculate(
+                accuracy: np.number = self.accuracy.calculate(
                     predictions, batch_y_train, self.combined_function_type)
 
                 # Perform a backwards pass.
@@ -204,12 +204,13 @@ class Model:
                 continue
 
             # Calculate the accumulated loss.
-            accumulated_data_loss: float = self.loss_function.calculate_accumulated_loss()
-            accumulated_regularisation_loss: float = self.calculate_regularisation_loss()
-            accumulated_loss: float = accumulated_data_loss + accumulated_regularisation_loss
+            accumulated_data_loss: np.number = self.loss_function.calculate_accumulated_loss()
+            accumulated_regularisation_loss: np.number = self.calculate_regularisation_loss()
+            accumulated_loss: np.number = accumulated_data_loss + \
+                accumulated_regularisation_loss
 
             # Calculate the accumulated accuracy.
-            accumulated_accuracy: float = self.accuracy.calculate_accumulated_accuracy()
+            accumulated_accuracy: np.number = self.accuracy.calculate_accumulated_accuracy()
 
             print(
                 f'Accumulated Accuracy: {accumulated_accuracy:.3f}, ' +
@@ -268,7 +269,7 @@ class Model:
             predictions = self.prediction_layer.prediction(output)
 
             # Calculate accuracy.
-            accuracy: float = self.accuracy.calculate(
+            accuracy: np.number = self.accuracy.calculate(
                 predictions, batch_y_val, self.combined_function_type)
 
             if step <= steps:
@@ -282,10 +283,10 @@ class Model:
             return
 
         # Calculate the accumulated loss.
-        accumulated_loss: float = self.loss_function.calculate_accumulated_loss()
+        accumulated_loss: np.number = self.loss_function.calculate_accumulated_loss()
 
         # Calculate the accumulated accuracy.
-        accumulated_accuracy: float = self.accuracy.calculate_accumulated_accuracy()
+        accumulated_accuracy: np.number = self.accuracy.calculate_accumulated_accuracy()
 
         print(
             f'Accumulated Accuracy: {accumulated_accuracy:.3f}, ' +

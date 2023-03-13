@@ -14,7 +14,7 @@ class Regression(Accuracy):
         super().__init__()
 
         # Calculate the precision value based on the passed-in ground truth values.
-        self.precision: float = np.std(y) / 250
+        self.precision: np.number = np.std(y) / 250
 
     def compare(self, predictions: np.ndarray, y: np.ndarray) -> bool:
         return np.absolute(predictions - y) < self.precision

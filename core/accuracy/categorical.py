@@ -13,7 +13,7 @@ class Categorical(Accuracy):
         '''
         super().__init__()
 
-        self.binary: float = binary
+        self.binary: np.number = binary
 
     def compare(self, *, predictions: np.ndarray, y: np.ndarray) -> bool:
         # If labels are one-hot encoded, turn them into discrete values.
