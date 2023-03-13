@@ -12,8 +12,8 @@ class LossFunction(Layer):
         '''
         '''
         super().__init__(is_trainable=False)
-        self.accumulated_loss: float = 0
-        self.accumulated_sample_count: int = 0
+        self.accumulated_loss: np.number = 0
+        self.accumulated_sample_count: np.number = 0
 
     def forward(self, y_pred: np.ndarray, y_true: np.ndarray) -> None:
         '''
@@ -40,7 +40,7 @@ class LossFunction(Layer):
 
         return data_loss
 
-    def calculate_accumulated_loss(self) -> np.ndarray:
+    def calculate_accumulated_loss(self) -> np.number:
         '''
         Calculate the accumulated loss.
         '''
