@@ -2,7 +2,13 @@
 A ML library based on the [Neural Networks From Scratch](https://nnfs.io) book.
 
 ## Requirements
-- Python 3.9.13 minimum
+- Python 3.9.13 minimum.
+- Python Libraries:
+  - numpy
+- Libraries For Examples:
+  - nnfs
+  - cv2
+  - matplotlib
 
 ## Setup
 Install the following libraries:
