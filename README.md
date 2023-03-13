@@ -7,17 +7,22 @@ A ML library based on the [Neural Networks From Scratch](https://nnfs.io) book.
 ## Setup
 Install the following libraries:
 ```
-$ pip install numpy matplotlib nnfs
+$ pip install numpy
 ```
 Install wobbly-ml as a dev library:
 ```
 $ sh install.sh
 ```
 
-## Usage
-Run the example `main.py` file:
+Running the examples will require additional libraries:
 ```
-$ python3 main.py
+$ pip install matplotlib nnfs opencv-contrib-python-headless
+``` 
+
+## Usage
+Run the example `regression.py` file:
+```
+$ python3 regression.py
 ```
 
 ## Testing

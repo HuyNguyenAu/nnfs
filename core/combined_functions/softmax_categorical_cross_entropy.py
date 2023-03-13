@@ -34,7 +34,7 @@ class SoftmaxCategoricalCrossEntropy(Layer):
         # this function will a single parameter.
         if y_true is None:
             return
-        
+
         samples: int = len(d_values)
 
         # If labels are one-hot encoded, turn them into discrete values.
@@ -57,7 +57,7 @@ class SoftmaxCategoricalCrossEntropy(Layer):
         Calculate the data and regularlisation losses given the model output and ground truth values.
         '''
         return self.loss.calculate(output=output, y=y)
-    
+
     def regularisation_loss(self, layer: any) -> np.number:
         '''
         Calculate the regularisation loss.
