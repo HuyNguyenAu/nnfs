@@ -4,3 +4,4 @@ dist/
 *.egg-info/
 fashion_mnist_images/
 fashion_mnist_images.zip
+.DS_Store
