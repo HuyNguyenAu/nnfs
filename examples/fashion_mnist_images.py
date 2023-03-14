@@ -116,5 +116,6 @@ model.finalise()
 model.train(x_train=x_train, y_train=y_train,
             epochs=5, batch_size=128, print_every=100)
 
-# Perfom model evaluation.
-model.evaluate(x_train, y_train)
+# Perfom model validation.
+model.validate(x_val=x_val, y_val=y_val)
+# %%
