@@ -1,6 +1,11 @@
 # Wobbly ML
 A ML library based on the [Neural Networks From Scratch](https://nnfs.io) book.
 
+Running the example regression gives the following results:
+![Regression Result](./regresssion.jpg)
+
+We can also see that the loss is very noisy. Not every impressive, but it works! Yay?
+
 ## Requirements
 - Python 3.9.13 minimum.
 - Python Libraries:
